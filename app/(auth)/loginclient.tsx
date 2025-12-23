@@ -19,7 +19,7 @@ export default function Register() {
     <View style={styles.container}>
       <View style={styles.card}>
         {/* Header */}
-        <Text style={styles.title}>Cadastre-se</Text>
+        <Text style={styles.title}>Acesse a plataforma</Text>
         <Text style={styles.subtitle}>
           <Text style={styles.highlight}></Text>
         </Text>
@@ -27,18 +27,6 @@ export default function Register() {
         {/* Progress */}
         <View style={styles.progressBar}>
           <View style={styles.progressFill} />
-        </View>
-
-        {/* Inputs */}
-        <View style={styles.field}>
-          <Text style={styles.label}>Nome completo</Text>
-          <TextInput
-            placeholder="Digite seu nome completo"
-            placeholderTextColor="#777"
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-          />
         </View>
 
         <View style={styles.field}>
@@ -55,24 +43,24 @@ export default function Register() {
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>WhatsApp</Text>
+          <Text style={styles.label}>Senha</Text>
           <TextInput
-            placeholder="+55 (11) 99999-9999"
+            placeholder="Digite sua senha"
             placeholderTextColor="#777"
             style={styles.input}
-            value={whatsapp}
-            onChangeText={setWhatsapp}
-            keyboardType="phone-pad"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
-
         {/* CTA */}
         <TouchableOpacity
           style={styles.primaryButton}
           activeOpacity={0.85}
           onPress={() => router.replace("/(auth)/loginclient")}
         >
-          <Text style={styles.primaryText}>Criar conta no Rabisco Team</Text>
+          <Text style={styles.primaryText}>Entrar</Text>
         </TouchableOpacity>
 
         {/* Divider */}
@@ -83,19 +71,12 @@ export default function Register() {
         </View>
 
         {/* Login */}
-        <TouchableOpacity onPress={() => router.replace("/(auth)/loginclient")}>
+        <TouchableOpacity onPress={() => router.replace("/(auth)/register")}>
           <Text style={styles.loginText}>
-            Já tem uma conta?{" "}
-            <Text style={styles.loginLink}>Fazer login →</Text>
+            Ainda não é assinante?{" "}
+            <Text style={styles.loginLink}>Cadastre-se →</Text>
           </Text>
         </TouchableOpacity>
-
-        {/* Footer */}
-        <Text style={styles.footer}>
-          Ao criar uma conta, você concorda com nossos{" "}
-          <Text style={styles.footerLink}>Termos de Serviço</Text> e{" "}
-          <Text style={styles.footerLink}>Política de Privacidade</Text>.
-        </Text>
       </View>
     </View>
   );

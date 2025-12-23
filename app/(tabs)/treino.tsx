@@ -1,43 +1,83 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
 
 // Dados mockados de exercícios
-const exercicios = [
+const exerciciosMock = [
   { id: 1, nome: "Supino Reto", series: 4, repeticoes: 12 },
   { id: 2, nome: "Supino Inclinado", series: 3, repeticoes: 10 },
   { id: 3, nome: "Tríceps Pulley", series: 3, repeticoes: 15 },
   { id: 4, nome: "Tríceps Francês", series: 3, repeticoes: 12 },
 ];
 
+type Exercicio = {
+  id: number;
+  nome: string;
+  series: number;
+  repeticoes: number;
+  concluido: boolean;
+};
+
 export default function Treino() {
-  const handleRegistrarCarga = (exercicioId: number) => {
-    // Mock: ação de registrar carga
-    console.log(`Registrar carga para exercício ${exercicioId}`);
+  const [exercicios, setExercicios] = useState<Exercicio[]>(
+    exerciciosMock.map((ex) => ({
+      ...ex,
+      concluido: false,
+    }))
+  );
+
+  const concluirExercicio = (id: number) => {
+    setExercicios((prev) =>
+      prev.map((ex) => (ex.id === id ? { ...ex, concluido: true } : ex))
+    );
   };
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      
+
       <View style={styles.content}>
         <Text style={styles.title}>Treino</Text>
-        
+
         {exercicios.map((exercicio) => (
-          <View key={exercicio.id} style={styles.exercicioCard}>
+          <View
+            key={exercicio.id}
+            style={[
+              styles.exercicioCard,
+              exercicio.concluido && styles.cardConcluido,
+            ]}
+          >
             <View style={styles.exercicioInfo}>
-              <Text style={styles.exercicioNome}>{exercicio.nome}</Text>
-              <Text style={styles.exercicioDetalhes}>
+              <Text
+                style={[
+                  styles.exercicioNome,
+                  exercicio.concluido && styles.textConcluido,
+                ]}
+              >
+                {exercicio.nome}
+              </Text>
+
+              <Text
+                style={[
+                  styles.exercicioDetalhes,
+                  exercicio.concluido && styles.textConcluido,
+                ]}
+              >
                 {exercicio.series} séries x {exercicio.repeticoes} repetições
               </Text>
             </View>
-            
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => handleRegistrarCarga(exercicio.id)}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.buttonText}>Registrar carga</Text>
-            </TouchableOpacity>
+
+            {!exercicio.concluido ? (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => concluirExercicio(exercicio.id)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.buttonText}>Concluir exercício</Text>
+              </TouchableOpacity>
+            ) : (
+              <Text style={styles.doneText}>✔ Exercício concluído</Text>
+            )}
           </View>
         ))}
       </View>
@@ -93,5 +133,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
+  cardConcluido: {
+    opacity: 0.6,
+  },
+  textConcluido: {
+    textDecorationLine: "line-through",
+    color: "#666",
+  },
+  doneText: {
+    color: "#00FF00",
+    fontSize: 14,
+    fontWeight: "600",
+    textAlign: "center",
+  },
 });
-
