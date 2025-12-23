@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AppRole {
+  master
+  collaborator
+  student
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  roles     UserRole[]
+  profile   Profile?
+  exercises Exercise[]
+  workouts  StudentWorkout[] @relation("StudentWorkouts")
+  trainerWorkouts StudentWorkout[] @relation("TrainerWorkouts")
+  diets     StudentDiet[] @relation("StudentDiets")
+  nutritionistDiets StudentDiet[] @relation("NutritionistDiets")
+  anamnesis Anamnesis?
+
+  @@map("users")
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String
+  role      AppRole
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@map("user_roles")
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  fullName  String?
+  avatarUrl String?
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model ExerciseCategory {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  icon        String?
+  createdAt   DateTime   @default(now())
+
+  exercises   Exercise[]
+
+  @@map("exercise_categories")
+}
+
+model Exercise {
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  instructions  String?
+  videoUrl      String?
+  thumbnailUrl  String?
+  muscleGroups  String[]
+  equipment     String[]
+  difficulty    String
+  categoryId    String
+  createdById   String
+  isPublic      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category      ExerciseCategory @relation(fields: [categoryId], references: [id])
+  createdBy     User            @relation(fields: [createdById], references: [id])
+  workoutExercises WorkoutExercise[]
+
+  @@map("exercises")
+}
+
+model StudentWorkout {
+  id          String   @id @default(uuid())
+  studentId   String
+  trainerId   String
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  student     User     @relation("StudentWorkouts", fields: [studentId], references: [id])
+  trainer     User     @relation("TrainerWorkouts", fields: [trainerId], references: [id])
+  exercises   WorkoutExercise[]
+
+  @@map("student_workouts")
+}
+
+model WorkoutExercise {
+  id          String   @id @default(uuid())
+  workoutId   String
+  exerciseId  String
+  sets        Int
+  reps        String
+  restSeconds Int?
+  notes       String?
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  workout     StudentWorkout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exercise    Exercise       @relation(fields: [exerciseId], references: [id])
+
+  @@map("workout_exercises")
+}
+
+model StudentDiet {
+  id            String   @id @default(uuid())
+  studentId     String
+  nutritionistId String
+  name          String
+  description   String?
+  caloriesTarget Int?
+  proteinTarget  Int?
+  carbsTarget    Int?
+  fatTarget      Int?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  student       User     @relation("StudentDiets", fields: [studentId], references: [id])
+  nutritionist  User     @relation("NutritionistDiets", fields: [nutritionistId], references: [id])
+  meals         Meal[]
+
+  @@map("student_diets")
+}
+
+model Meal {
+  id          String   @id @default(uuid())
+  dietId      String
+  name        String
+  time        String
+  foods       String[]
+  calories    Int?
+  protein     Int?
+  carbs       Int?
+  fat         Int?
+  notes       String?
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  diet        StudentDiet @relation(fields: [dietId], references: [id], onDelete: Cascade)
+
+  @@map("meals")
+}
+
+model Anamnesis {
+  id                String   @id @default(uuid())
+  userId             String   @unique
+  fullName           String?
+  sex                String?
+  profession         String?
+  routineType        String?
+  age                Int?
+  trainingFrequency  Int?
+  sleepHours         Int?
+  mealsPerDay        Int?
+  weight             Float?
+  height             Float?
+  waterIntake        Int?
+  primaryGoal        String?
+  experienceLevel    String?
+  secondaryGoals     String[]
+  healthConditions   String[]
+  allergies          String[]
+  dietRestrictions   String[]
+  availableEquipment String[]
+  foodPreferences    String?
+  injuries           String?
+  medications        String?
+  notes              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("anamnesis")
+}
